@@ -1,5 +1,5 @@
 import ViewToggle from './ViewToggle'
-import logo from '../../assets/ChatGPT Image Dec 31, 2025, 08_08_35 PM.png'
+import logo from '../../assets/logo.png'
 
 const Header = () => {
   return (
