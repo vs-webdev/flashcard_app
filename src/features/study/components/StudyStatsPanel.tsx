@@ -3,34 +3,42 @@ import { HiOutlineSquare3Stack3D } from "react-icons/hi2";
 import { RiBrain2Line } from "react-icons/ri";
 import { IoBookOutline } from "react-icons/io5";
 import { FiInbox } from "react-icons/fi";
+import { useFlashcardStore } from '../../../store/store';
 
 const StudyStatsPanel = () => {
+  const total = useFlashcardStore(state => state.cards.length);
+  const mastered = useFlashcardStore(state => 
+    state.cards.filter(c => c.masteryLevel === 5).length
+  );
+  const inProgress = useFlashcardStore(state => 
+    state.cards.filter(c => c.masteryLevel > 0 && c.masteryLevel < 5).length
+  );
+  const notStarted = useFlashcardStore(state => 
+    state.cards.filter(c => c.masteryLevel === 0).length
+  );
+
   const cards = [
     {
-      id: 1,
       title: 'Total Cards',
-      count: 40,
+      count: total,
       icon: HiOutlineSquare3Stack3D,
       bgColor: '#93acec',
     },
     {
-      id: 2,
       title: 'Mastered',
-      count: 11,
+      count: mastered,
       icon: RiBrain2Line,
       bgColor: '#48d9cd'
     },
     {
-      id: 3,
       title: 'In Progress',
-      count: 21,
+      count: inProgress,
       icon: IoBookOutline,
       bgColor: '#f173a3'
     },
     {
-      id: 4,
       title: 'Not Started',
-      count: 8,
+      count: notStarted,
       icon: FiInbox,
       bgColor: '#fd8ae5'
     },
@@ -43,7 +51,7 @@ const StudyStatsPanel = () => {
       </h2>
       {
         cards.map(card => (
-          <StatCard key={card.id} 
+          <StatCard key={card.title}           
             title={card.title} 
             count={card.count}
             icon={card.icon}
