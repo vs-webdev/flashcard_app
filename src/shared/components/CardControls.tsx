@@ -5,7 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 
 const CardControls = () => {
   const cards = useFlashcardStore(state => state.cards)
-
+  const toggleHideMastered = useFlashcardStore(state => state.toggleHideMastered)
+  const hideMastered = useFlashcardStore(state => state.hideMastered)
+  const handleShuffle = useFlashcardStore(state => state.shuffleCards)
   const categories = useMemo(() => {
     return Array.from(new Set(cards.map(card => card.category)))
   }, [cards])
@@ -38,8 +40,8 @@ const CardControls = () => {
             onClick={e => e.stopPropagation()}
           >
             {
-              categories.map((category, index) => (
-                <div key={index}>
+              categories.map((category) => (
+                <div key={category}>
                   <label htmlFor={category} 
                     className="w-full py-2 px-4 text-left flex items-center hover:bg-gray-100 cursor-pointer whitespace-nowrap cursor-pointer select-none"
                   >
