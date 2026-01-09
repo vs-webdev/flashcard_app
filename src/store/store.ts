@@ -2,11 +2,16 @@ import { create } from "zustand";
 import type { Card } from "../shared/types/common.types";
 import { v4 } from "uuid";
 
-interface FlashcardStore {
+type ViewMode = 'study' | 'allCards'
+
+export interface FlashcardStore {
   cards: Card[];
+  selectedCategory: string | null;
   hideMastered: boolean;
+  view: ViewMode;
 
   // Card Actions
+  setView: (mode: ViewMode) => void;
   loadCards: (cards: Card[]) => void;
   addCard: (card: Omit<Card, 'id'>) => void;
   deleteCard: (id: string) => void;
@@ -17,7 +22,11 @@ interface FlashcardStore {
 
 export const useFlashcardStore = create<FlashcardStore>((set) => ({
   cards: [],
+  selectedCategory: null,
+  view: 'study',
   hideMastered: false,
+
+  setView: (view) => set({view}),
 
   loadCards: (cards) => set({cards}),
 
