@@ -2,6 +2,7 @@ import { useFlashcardStore } from "../../store/store";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { IoShuffle } from "react-icons/io5";
 import { FaChevronDown } from "react-icons/fa";
+import { useClickOutside } from "../hooks/useClickOutside";
 
 const CardControls = () => {
   const cards = useFlashcardStore(state => state.cards);
@@ -16,19 +17,7 @@ const CardControls = () => {
   const [showCategories, setShowCategories] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowCategories(false);
-      }
-    };
-    
-    document.addEventListener('click', handler);
-    
-    return () => {
-      document.removeEventListener('click', handler);
-    };
-  }, []);
+  useClickOutside(dropdownRef, () => setShowCategories(false), showCategories)
 
   return (
     <div className='flex justify-between'>
