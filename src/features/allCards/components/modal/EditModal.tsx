@@ -1,33 +1,38 @@
 import { IoCloseSharp } from "react-icons/io5";
 import { useState, type FC, type FormEvent } from "react";
+import { useFlashcardStore } from "../../../../store/store";
+import type { Card, CardInput } from "../../../../shared/types/common.types";
 
-type FormData = {
-  question: string;
-  answer: string;
-  category: string;
+interface EditModalProps {
+  card: Card,
 }
 
-interface editModalProps {
-  question: string,
-  answer: string,
-  category: string,
-}
+const EditModal: FC<EditModalProps> = ({card}) => {
+  const setActiveModal = useFlashcardStore(state => state.setActiveModal)
+  const updateCard = useFlashcardStore(state => state.updateCard)
 
-const EditModal: FC<editModalProps> = ({question, answer, category}) => {
-  const [formData, setFormData] = useState<FormData>({
-    question,
-    answer,
-    category,
+  const [formData, setFormData] = useState<CardInput>({
+    question: card.question,
+    answer: card.answer,
+    category: card.category,
   })
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!formData.question.trim() || !formData.answer.trim() || !formData.category.trim()) {
+    const trimmedData = {
+      question: formData.question.trim(),
+      answer: formData.answer.trim(),
+      category: formData.category.trim(),
+    }
+    
+    if (!trimmedData.question || !trimmedData.answer || !trimmedData.category) {
       console.log('error')
       return;
     };
 
-    console.log(formData.question, formData.answer, formData.category)
+    updateCard(card.id, trimmedData)
+    setActiveModal(null)
+
     setFormData({question: "", answer: "", category: ""})
   }
 
@@ -35,10 +40,12 @@ const EditModal: FC<editModalProps> = ({question, answer, category}) => {
     <div className="flex flex-col p-8 w-140 border rounded-xl text-left bg-[var(--color-white)] shadow-[1px_1px_0_1px_var(--color-maroon)]">
       <button
         className="ml-auto"
+        onClick={() => setActiveModal(null)}
       >
         <IoCloseSharp size={20} />
       </button>
       <h1 className="text-2xl font-semibold">Edit your card</h1>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-6 w-full">
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="modal-question" className="font-semibold">
