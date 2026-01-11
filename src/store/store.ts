@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Card } from "../shared/types/common.types";
+import type { Card, CardInput } from "../shared/types/common.types";
 import { v4 } from "uuid";
 
 type ViewMode = 'study' | 'allCards'
@@ -9,11 +9,13 @@ export interface FlashcardStore {
   selectedCategory: string | null;
   hideMastered: boolean;
   view: ViewMode;
+  activeModal: {type: 'edit' | 'delete', cardId: string} | null;
+  setActiveModal: (modal: {type: 'edit' | 'delete', cardId: string} | null) => void;
+  setView: (mode: ViewMode) => void;
 
   // Card Actions
-  setView: (mode: ViewMode) => void;
   loadCards: (cards: Card[]) => void;
-  addCard: (card: Omit<Card, 'id'>) => void;
+  addCard: (card: CardInput) => void;
   deleteCard: (id: string) => void;
   updateCard: (id: string, updates: Partial<Card>) => void;
   shuffleCards: () => void;
@@ -25,6 +27,9 @@ export const useFlashcardStore = create<FlashcardStore>((set) => ({
   selectedCategory: null,
   view: 'study',
   hideMastered: false,
+  activeModal: null,
+
+  setActiveModal: (modal) => set({activeModal: modal}),
 
   setView: (view) => set({view}),
 
