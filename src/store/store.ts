@@ -6,12 +6,14 @@ type ViewMode = 'study' | 'allCards'
 
 export interface FlashcardStore {
   cards: Card[];
-  selectedCategory: string | null;
+  selectedCategories: string[];
+  toggleCategories: (category: string) => void;
   hideMastered: boolean;
   view: ViewMode;
   activeModal: {type: 'edit' | 'delete', cardId: string} | null;
   setActiveModal: (modal: {type: 'edit' | 'delete', cardId: string} | null) => void;
   setView: (mode: ViewMode) => void;
+
 
   // Card Actions
   loadCards: (cards: Card[]) => void;
@@ -24,10 +26,16 @@ export interface FlashcardStore {
 
 export const useFlashcardStore = create<FlashcardStore>((set) => ({
   cards: [],
-  selectedCategory: null,
+  selectedCategories: [],
   view: 'study',
   hideMastered: false,
   activeModal: null,
+
+  toggleCategories: (category) => set(state => ({
+    selectedCategories: state.selectedCategories.includes(category)
+      ? state.selectedCategories.filter(c => c !== category)
+      : [...state.selectedCategories, category]
+  })),
 
   setActiveModal: (modal) => set({activeModal: modal}),
 
