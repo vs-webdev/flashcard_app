@@ -1,20 +1,20 @@
-import type { FC } from "react"
 import DeleteModal from "./DeleteModal"
 import EditModal from "./EditModal"
+import { useFlashcardStore } from "../../../../store/store"
 
-type modalType = 'edit' | 'delete'
+const ModalOverlay = () => {
+  const activeModal = useFlashcardStore(state => state.activeModal)
+  const cards = useFlashcardStore(state => state.cards)
 
-interface modalProps {
-  modalName: modalType,
-}
+  if (!activeModal) return null;
 
-const ModalOverlay: FC<modalProps> = ({modalName}) => {
+  const card = cards.find(card => card.id === activeModal.cardId)
+  if (!card) return null;
+  
   return (
     <div className="fixed flex items-center justify-center z-10 inset-0 w-screen h-screen bg-gray-500/50">
-      {modalName === "edit"
-        ? <EditModal />
-        : <DeleteModal /> 
-      }
+      {activeModal.type === "edit" && <EditModal card={card} />}
+      {activeModal.type === "delete" && <DeleteModal cardId={activeModal.cardId} />}
     </div>
   )
 }

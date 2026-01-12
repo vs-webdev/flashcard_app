@@ -1,21 +1,29 @@
-import { useEffect, useRef, useState, type FC } from "react"
+import { useRef, useState, type FC } from "react"
 import { BiSolidBrain } from "react-icons/bi";
 import { SlOptionsVertical } from "react-icons/sl";
 import { FiEdit2 } from "react-icons/fi";
 import { AiFillDelete } from "react-icons/ai";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
+import { useFlashcardStore } from "../../../store/store";
 
 type MasteryLevel = 0 | 1 | 2 | 3 | 4 | 5
 
 interface CardItemProps {
+  id: string,
   question: string,
   answer: string,
   category: string,
   currentMasteryLevel: MasteryLevel,
 }
 
-const CardItem: FC<CardItemProps> = ({question, answer, category, currentMasteryLevel}) => {
+const CardItem: FC<CardItemProps> = ({id, question, answer, category, currentMasteryLevel}) => {
+  const setActiveModal = useFlashcardStore(state => state.setActiveModal)
   const [isOptionOpen, setIsOptionOpen] = useState(false)
+  const handleOptionClick = (type: 'edit' | 'delete') => {
+    setIsOptionOpen(false)
+    setActiveModal({type, cardId: id})
+  }
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(dropdownRef, () => setIsOptionOpen(false), isOptionOpen)
@@ -68,11 +76,17 @@ const CardItem: FC<CardItemProps> = ({question, answer, category, currentMastery
                 ? 'opacity-100 translate-y-0 pointer-events-auto' 
                 : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}>
-            <button className="flex items-center gap-2 px-2 py-1 w-full text-left hover:bg-gray-100">
+            <button 
+              className="flex items-center gap-2 px-2 py-1 w-full text-left hover:bg-gray-100"
+              onClick={() => handleOptionClick('edit')}
+            >
               <FiEdit2 size={13} />
               Edit
             </button>
-            <button className="flex items-center gap-2 px-2 py-1 w-full text-left hover:bg-gray-100">
+            <button 
+              className="flex items-center gap-2 px-2 py-1 w-full text-left hover:bg-gray-100"
+              onClick={() => handleOptionClick('delete')}
+            >
               <AiFillDelete size={13} />
               Delete
             </button>
