@@ -1,22 +1,33 @@
 import { useFlashcardStore } from "../../store/store";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useShallow } from "zustand/shallow";
+import { useMemo, useState, useRef } from "react";
 import { IoShuffle } from "react-icons/io5";
 import { FaChevronDown } from "react-icons/fa";
 import { useClickOutside } from "../hooks/useClickOutside";
 
 const CardControls = () => {
-  const cards = useFlashcardStore(state => state.cards);
-  const toggleHideMastered = useFlashcardStore(state => state.toggleHideMastered);
-  const hideMastered = useFlashcardStore(state => state.hideMastered);
-  const handleShuffle = useFlashcardStore(state => state.shuffleCards);
-  
+  const {
+    cards,
+    selectedCategories,
+    toggleCategories,
+    hideMastered,
+    toggleHideMastered,
+    shuffleCards,
+  } = useFlashcardStore(useShallow(state => ({
+    cards: state.cards,
+    selectedCategories: state.selectedCategories,
+    toggleCategories: state.toggleCategories,
+    hideMastered: state.hideMastered,
+    toggleHideMastered: state.toggleHideMastered,
+    shuffleCards: state.shuffleCards,
+  })))
+
   const categories = useMemo(() => {
     return Array.from(new Set(cards.map(card => card.category)));
   }, [cards]);
 
   const [showCategories, setShowCategories] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   useClickOutside(dropdownRef, () => setShowCategories(false), showCategories)
 
   return (
@@ -57,6 +68,8 @@ const CardControls = () => {
                       type="checkbox" 
                       id={category}
                       className="mr-2"
+                      checked={selectedCategories.includes(category)}
+                      onChange={() => toggleCategories(category)}
                     />
                     {category}
                   </label>
@@ -81,7 +94,7 @@ const CardControls = () => {
 
       <button 
         className='flex items-center gap-2 border px-4 py-2 rounded-full bg-[var(--color-white)]'
-        onClick={handleShuffle}
+        onClick={shuffleCards}
       >
         <IoShuffle size={22} />
         <span className="leading-[10px] font-semibold">Shuffle</span>
