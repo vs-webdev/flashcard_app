@@ -9,6 +9,9 @@ import FlashcardNavigation from './FlashcardNavigation.tsx'
 
 const FlashcardViewer = () => {
   const filteredCards = useFlashcardStore(useShallow(selectFilteredCards))
+  const {selectedCategories} = useFlashcardStore(useShallow(state => ({
+    selectedCategories: state.selectedCategories,
+  })))
   const [currentCardIndex, setCurrentCardIndex] = useState(0)
   const currentCard = filteredCards[currentCardIndex]
   
@@ -18,6 +21,8 @@ const FlashcardViewer = () => {
     )
   }, [filteredCards])
 
+  const isFilterEmpty = filteredCards.length === 0;
+  
   const handleNextClick = () => setCurrentCardIndex(prev => Math.min(filteredCards.length - 1, prev + 1))
   const handlePrevClick = () => setCurrentCardIndex(prev => Math.max(0, prev - 1))
 
@@ -27,19 +32,33 @@ const FlashcardViewer = () => {
         <CardControls />
       </div>
 
-      <div className='p-6 border-t border-b'>
-        <Flashcard card={currentCard} />
-        <FlashcardActions cardId={currentCard?.id} />
-      </div>
-
-      <div className='px-6 py-5'>
-        <FlashcardNavigation 
-          handleNextClick={handleNextClick} 
-          handlePrevClick={handlePrevClick}
-          currentCardIndex={currentCardIndex + 1}
-          totalCards={filteredCards.length}
-        />
-      </div>
+      {
+        isFilterEmpty
+          ? (<div className='border-t h-147 flex flex-col items-center justify-center'>
+            <h1 className='text-2xl font-semibold mb-3'>Category mastered!</h1>
+            <p className='text-xl w-150'>
+              All cards in {
+                selectedCategories.map(category => (
+                  <span key={category}>{category} </span>
+                ))
+            } category are mastered. Turn off 'Hide mastered'  or selected different category to continue studying.
+            </p>
+          </div>)
+          : (<div>
+            <div className='p-6 border-t border-b'>
+              <Flashcard card={currentCard} />
+              <FlashcardActions card={currentCard} />
+            </div>
+            <div className='px-6 py-5'>
+              <FlashcardNavigation
+                handleNextClick={handleNextClick}
+                handlePrevClick={handlePrevClick}
+                currentCardIndex={currentCardIndex + 1}
+                totalCards={filteredCards.length}
+              />
+            </div>
+          </div>)
+      }
     </div>
   )
 }
