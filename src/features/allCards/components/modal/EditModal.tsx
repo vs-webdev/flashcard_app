@@ -1,4 +1,5 @@
 import { IoCloseSharp } from "react-icons/io5";
+import { IoMdAlert } from "react-icons/io";
 import { useState, type FC, type FormEvent } from "react";
 import { useFlashcardStore } from "../../../../store/store";
 import type { Card, CardInput } from "../../../../shared/types/common.types";
@@ -17,6 +18,12 @@ const EditModal: FC<EditModalProps> = ({card}) => {
     category: card.category,
   })
 
+  const [error, setError] = useState({
+    question: false,
+    answer: false,
+    category: false,
+  })
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const trimmedData = {
@@ -25,10 +32,15 @@ const EditModal: FC<EditModalProps> = ({card}) => {
       category: formData.category.trim(),
     }
     
-    if (!trimmedData.question || !trimmedData.answer || !trimmedData.category) {
-      console.log('error')
-      return;
-    };
+    const newErrors = {
+      question: !formData.question.trim(),
+      answer: !formData.answer.trim(),
+      category: !formData.category.trim(),
+    }
+    
+    setError(newErrors)
+
+    if (Object.values(newErrors).some(Boolean)) return;
 
     updateCard(card.id, trimmedData)
     setActiveModal(null)
@@ -57,9 +69,20 @@ const EditModal: FC<EditModalProps> = ({card}) => {
             value={formData.question}
             onChange={e => setFormData(prev => ({...prev, question: e.target.value}))}
             placeholder="e.g., What does HTML stand for?"
-            className="border outline-none rounded-md w-full px-3 py-3 shadow-[1px_1px_0_1px_var(--color-maroon)]"
+            className={`border outline-none rounded-md w-full px-3 py-3 shadow-[1px_1px_0_1px_var(--color-maroon)] ${
+              error.question 
+                ? 'border-[var(--color-error)] shadow-[2px_2px_0_var(--color-error)]' 
+                : 'border-black-500'
+            }`}
           />
+          {error.question && (
+            <span className="text-sm text-[var(--color-error)] flex items-center gap-1">
+              <IoMdAlert />
+              Please enter an question
+            </span>
+          )}
         </div>
+
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="modal-answer" className="font-semibold">
             Answer
@@ -70,9 +93,20 @@ const EditModal: FC<EditModalProps> = ({card}) => {
             value={formData.answer}
             onChange={e => setFormData(prev => ({...prev, answer: e.target.value}))}
             placeholder="e.g., Hyper Text Markup Language"
-            className="border outline-none rounded-md w-full px-3 py-3 resize-none shadow-[1px_1px_0_1px_var(--color-maroon)]"
+            className={`border outline-none rounded-md w-full px-3 py-3 shadow-[1px_1px_0_1px_var(--color-maroon)] resize-none ${
+              error.answer 
+                ? 'border-[var(--color-error)] shadow-[2px_2px_0_var(--color-error)]' 
+                : 'border-black-500'
+            }`}
           />
+        {error.answer && (
+          <span className="text-sm text-[var(--color-error)] flex items-center gap-1">
+            <IoMdAlert />
+            Please enter an answer
+          </span>
+        )}
         </div>
+
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="modal-category" className="font-semibold">
             Category
@@ -83,8 +117,18 @@ const EditModal: FC<EditModalProps> = ({card}) => {
             value={formData.category}
             onChange={e => setFormData(prev => ({...prev, category: e.target.value}))}
             placeholder="e.g., Javascript"
-            className="border outline-none rounded-md w-full px-3 py-3 shadow-[1px_1px_0_1px_var(--color-maroon)]"
+            className={`border outline-none rounded-md w-full px-3 py-3 shadow-[1px_1px_0_1px_var(--color-maroon)] ${
+              error.category 
+                ? 'border-[var(--color-error)] shadow-[2px_2px_0_var(--color-error)]' 
+                : 'border-black-500'
+            }`}
           />
+        {error.category && (
+          <span className="text-sm text-[var(--color-error)] flex items-center gap-1">
+            <IoMdAlert />
+            Please enter an category
+          </span>
+        )}
         </div>
 
         <button
