@@ -47,9 +47,17 @@ export const useFlashcardStore = create<FlashcardStore>((set) => ({
     cards: [...state.cards, {...card, id: v4(), masteryLevel: 0}]
   })),
 
-  deleteCard: (id) => set(state => ({
-    cards: state.cards.filter(card => card.id !== id)
-  })),
+  deleteCard: (id) => set(state => {
+    const updatedCards = state.cards.filter(card => card.id !== id)
+    const existingCategories = new Set(updatedCards.map(card => card.category))
+    const newSelectedCategories = state.selectedCategories?.filter(category =>
+      existingCategories.has(category)
+    ) ?? null;
+    return {
+      cards: updatedCards,
+      selectedCategories: newSelectedCategories.length ? newSelectedCategories : [],
+    }
+  }),
 
   updateCard: (id, updates) => {
     set(state => ({
